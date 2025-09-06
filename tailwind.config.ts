@@ -22,10 +22,12 @@ export default {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
+          hover: "hsl(var(--primary-hover))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
+          hover: "hsl(var(--secondary-hover))",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
@@ -38,6 +40,7 @@ export default {
         accent: {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
+          hover: "hsl(var(--accent-hover))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
@@ -46,7 +49,21 @@ export default {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
+          shadow: "hsl(var(--card-shadow))",
         },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+        },
+        column: {
+          bg: "hsl(var(--column-bg))",
+          header: "hsl(var(--column-header))",
+        },
+        "drag-active": "hsl(var(--drag-active))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -57,6 +74,11 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+      },
+      backgroundImage: {
+        "gradient-primary": "var(--gradient-primary)",
+        "gradient-secondary": "var(--gradient-secondary)",
+        "gradient-accent": "var(--gradient-accent)",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -80,10 +102,32 @@ export default {
             height: "0",
           },
         },
+        "drag-enter": {
+          "0%": {
+            transform: "scale(1)",
+            boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+          },
+          "100%": {
+            transform: "scale(1.02)",
+            boxShadow: "0 10px 15px -3px hsl(var(--drag-active) / 0.3)",
+          },
+        },
+        "card-hover": {
+          "0%": {
+            transform: "translateY(0)",
+            boxShadow: "0 1px 3px 0 hsl(var(--card-shadow) / 0.3)",
+          },
+          "100%": {
+            transform: "translateY(-2px)",
+            boxShadow: "0 4px 6px -1px hsl(var(--card-shadow) / 0.4)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "drag-enter": "drag-enter 0.2s ease-out",
+        "card-hover": "card-hover 0.2s ease-out",
       },
     },
   },
