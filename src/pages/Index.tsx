@@ -1,9 +1,12 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { KanbanBoard } from '@/components/kanban/KanbanBoard';
 import { KanbanColumn, KanbanCard } from '@/types/kanban';
 import { Button } from '@/components/ui/button';
-import { Settings, Filter, Search } from 'lucide-react';
+import { Settings, Filter, Search, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 // Initial demo data
 const initialColumns: KanbanColumn[] = [
@@ -86,6 +89,50 @@ const initialColumns: KanbanColumn[] = [
 const Index = () => {
   const [columns, setColumns] = useState<KanbanColumn[]>(initialColumns);
   const [searchTerm, setSearchTerm] = useState('');
+  const [filters, setFilters] = useState({
+    assignee: '',
+    priority: '',
+    dueDate: ''
+  });
+
+  // Get unique assignees and priorities for filter options
+  const filterOptions = useMemo(() => {
+    const allCards = columns.flatMap(col => col.cards);
+    const assignees = [...new Set(allCards.map(card => card.assignee).filter(Boolean))];
+    const priorities = ['low', 'medium', 'high', 'critical'];
+    return { assignees, priorities };
+  }, [columns]);
+
+  // Filter and search logic
+  const filteredColumns = useMemo(() => {
+    return columns.map(column => ({
+      ...column,
+      cards: column.cards.filter(card => {
+        // Search filter
+        const matchesSearch = !searchTerm || 
+          card.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (card.description && card.description.toLowerCase().includes(searchTerm.toLowerCase()));
+
+        // Assignee filter
+        const matchesAssignee = !filters.assignee || card.assignee === filters.assignee;
+
+        // Priority filter
+        const matchesPriority = !filters.priority || card.priority === filters.priority;
+
+        // Due date filter (simple - could be enhanced)
+        const matchesDueDate = !filters.dueDate || card.dueDate === filters.dueDate;
+
+        return matchesSearch && matchesAssignee && matchesPriority && matchesDueDate;
+      })
+    }));
+  }, [columns, searchTerm, filters]);
+
+  const clearFilters = () => {
+    setFilters({ assignee: '', priority: '', dueDate: '' });
+    setSearchTerm('');
+  };
+
+  const hasActiveFilters = searchTerm || filters.assignee || filters.priority || filters.dueDate;
 
   return (
     <div className="min-h-screen bg-background">
@@ -111,10 +158,82 @@ const Index = () => {
                 />
               </div>
               
-              <Button variant="secondary" size="sm">
-                <Filter className="h-4 w-4 mr-2" />
-                Filter
-              </Button>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="secondary" size="sm" className="relative">
+                    <Filter className="h-4 w-4 mr-2" />
+                    Filters
+                    {hasActiveFilters && (
+                      <Badge variant="destructive" className="ml-2 h-2 w-2 p-0 text-[10px]">
+                        •
+                      </Badge>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80" align="end">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-semibold">Filters</h3>
+                      {hasActiveFilters && (
+                        <Button variant="ghost" size="sm" onClick={clearFilters}>
+                          <X className="h-4 w-4 mr-1" />
+                          Clear
+                        </Button>
+                      )}
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div>
+                        <label className="text-sm font-medium mb-1 block">Assignee</label>
+                        <Select value={filters.assignee} onValueChange={(value) => 
+                          setFilters(prev => ({ ...prev, assignee: value }))
+                        }>
+                          <SelectTrigger>
+                            <SelectValue placeholder="All assignees" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="">All assignees</SelectItem>
+                            {filterOptions.assignees.map(assignee => (
+                              <SelectItem key={assignee} value={assignee}>
+                                {assignee}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div>
+                        <label className="text-sm font-medium mb-1 block">Priority</label>
+                        <Select value={filters.priority} onValueChange={(value) => 
+                          setFilters(prev => ({ ...prev, priority: value }))
+                        }>
+                          <SelectTrigger>
+                            <SelectValue placeholder="All priorities" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="">All priorities</SelectItem>
+                            {filterOptions.priorities.map(priority => (
+                              <SelectItem key={priority} value={priority}>
+                                <span className="capitalize">{priority}</span>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div>
+                        <label className="text-sm font-medium mb-1 block">Due Date</label>
+                        <Input
+                          type="date"
+                          value={filters.dueDate}
+                          onChange={(e) => setFilters(prev => ({ ...prev, dueDate: e.target.value }))}
+                          className="w-full"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
               
               <Button variant="secondary" size="sm">
                 <Settings className="h-4 w-4 mr-2" />
@@ -125,9 +244,38 @@ const Index = () => {
         </div>
       </header>
 
+      {/* Active Filters Display */}
+      {hasActiveFilters && (
+        <div className="bg-muted/50 border-b px-6 py-2">
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-muted-foreground">Active filters:</span>
+            {searchTerm && (
+              <Badge variant="secondary" className="text-xs">
+                Search: "{searchTerm}"
+              </Badge>
+            )}
+            {filters.assignee && (
+              <Badge variant="secondary" className="text-xs">
+                Assignee: {filters.assignee}
+              </Badge>
+            )}
+            {filters.priority && (
+              <Badge variant="secondary" className="text-xs">
+                Priority: {filters.priority}
+              </Badge>
+            )}
+            {filters.dueDate && (
+              <Badge variant="secondary" className="text-xs">
+                Due: {filters.dueDate}
+              </Badge>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Main Board */}
       <main className="h-[calc(100vh-120px)]">
-        <KanbanBoard columns={columns} onColumnsChange={setColumns} />
+        <KanbanBoard columns={filteredColumns} onColumnsChange={setColumns} />
       </main>
     </div>
   );
