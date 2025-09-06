@@ -90,8 +90,8 @@ const Index = () => {
   const [columns, setColumns] = useState<KanbanColumn[]>(initialColumns);
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({
-    assignee: '',
-    priority: '',
+    assignee: 'all',
+    priority: 'all',
     dueDate: ''
   });
 
@@ -114,10 +114,10 @@ const Index = () => {
           (card.description && card.description.toLowerCase().includes(searchTerm.toLowerCase()));
 
         // Assignee filter
-        const matchesAssignee = !filters.assignee || card.assignee === filters.assignee;
+        const matchesAssignee = filters.assignee === 'all' || card.assignee === filters.assignee;
 
         // Priority filter
-        const matchesPriority = !filters.priority || card.priority === filters.priority;
+        const matchesPriority = filters.priority === 'all' || card.priority === filters.priority;
 
         // Due date filter (simple - could be enhanced)
         const matchesDueDate = !filters.dueDate || card.dueDate === filters.dueDate;
@@ -128,11 +128,11 @@ const Index = () => {
   }, [columns, searchTerm, filters]);
 
   const clearFilters = () => {
-    setFilters({ assignee: '', priority: '', dueDate: '' });
+    setFilters({ assignee: 'all', priority: 'all', dueDate: '' });
     setSearchTerm('');
   };
 
-  const hasActiveFilters = searchTerm || filters.assignee || filters.priority || filters.dueDate;
+  const hasActiveFilters = searchTerm || filters.assignee !== 'all' || filters.priority !== 'all' || filters.dueDate;
 
   return (
     <div className="min-h-screen bg-background">
@@ -192,7 +192,7 @@ const Index = () => {
                             <SelectValue placeholder="All assignees" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">All assignees</SelectItem>
+                            <SelectItem value="all">All assignees</SelectItem>
                             {filterOptions.assignees.map(assignee => (
                               <SelectItem key={assignee} value={assignee}>
                                 {assignee}
@@ -211,7 +211,7 @@ const Index = () => {
                             <SelectValue placeholder="All priorities" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">All priorities</SelectItem>
+                            <SelectItem value="all">All priorities</SelectItem>
                             {filterOptions.priorities.map(priority => (
                               <SelectItem key={priority} value={priority}>
                                 <span className="capitalize">{priority}</span>
@@ -254,12 +254,12 @@ const Index = () => {
                 Search: "{searchTerm}"
               </Badge>
             )}
-            {filters.assignee && (
+            {filters.assignee !== 'all' && (
               <Badge variant="secondary" className="text-xs">
                 Assignee: {filters.assignee}
               </Badge>
             )}
-            {filters.priority && (
+            {filters.priority !== 'all' && (
               <Badge variant="secondary" className="text-xs">
                 Priority: {filters.priority}
               </Badge>
