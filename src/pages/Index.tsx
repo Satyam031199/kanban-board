@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { KanbanBoard } from '@/components/kanban/KanbanBoard';
+import { CardDetailModal } from '@/components/kanban/CardDetailModal';
 import { KanbanColumn, KanbanCard } from '@/types/kanban';
 import { Button } from '@/components/ui/button';
 import { Settings, Filter, Search, X } from 'lucide-react';
@@ -89,6 +90,8 @@ const initialColumns: KanbanColumn[] = [
 const Index = () => {
   const [columns, setColumns] = useState<KanbanColumn[]>(initialColumns);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCard, setSelectedCard] = useState<KanbanCard | null>(null);
+  const [isCardModalOpen, setIsCardModalOpen] = useState(false);
   const [filters, setFilters] = useState({
     assignee: 'all',
     priority: 'all',
@@ -133,6 +136,31 @@ const Index = () => {
   };
 
   const hasActiveFilters = searchTerm || filters.assignee !== 'all' || filters.priority !== 'all' || filters.dueDate;
+
+  const handleCardClick = (card: KanbanCard) => {
+    setSelectedCard(card);
+    setIsCardModalOpen(true);
+  };
+
+  const handleUpdateCard = (cardId: string, cardData: Omit<KanbanCard, 'id' | 'createdAt'>) => {
+    const newColumns = columns.map(col => ({
+      ...col,
+      cards: col.cards.map(card => 
+        card.id === cardId 
+          ? { ...card, ...cardData }
+          : card
+      )
+    }));
+    setColumns(newColumns);
+  };
+
+  const handleDeleteCard = (cardId: string) => {
+    const newColumns = columns.map(col => ({
+      ...col,
+      cards: col.cards.filter(card => card.id !== cardId)
+    }));
+    setColumns(newColumns);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -275,8 +303,21 @@ const Index = () => {
 
       {/* Main Board */}
       <main className="h-[calc(100vh-120px)]">
-        <KanbanBoard columns={filteredColumns} onColumnsChange={setColumns} />
+        <KanbanBoard 
+          columns={filteredColumns} 
+          onColumnsChange={setColumns} 
+          onCardClick={handleCardClick}
+        />
       </main>
+
+      {/* Card Detail Modal */}
+      <CardDetailModal
+        card={selectedCard}
+        isOpen={isCardModalOpen}
+        onOpenChange={setIsCardModalOpen}
+        onUpdateCard={handleUpdateCard}
+        onDeleteCard={handleDeleteCard}
+      />
     </div>
   );
 };

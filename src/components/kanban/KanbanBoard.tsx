@@ -18,9 +18,10 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 interface KanbanBoardProps {
   columns: KanbanColumnType[];
   onColumnsChange: (columns: KanbanColumnType[]) => void;
+  onCardClick?: (card: KanbanCardType) => void;
 }
 
-export function KanbanBoard({ columns, onColumnsChange }: KanbanBoardProps) {
+export function KanbanBoard({ columns, onColumnsChange, onCardClick }: KanbanBoardProps) {
   const [activeCard, setActiveCard] = useState<KanbanCardType | null>(null);
   const [addCardDialog, setAddCardDialog] = useState<{
     isOpen: boolean;
@@ -123,6 +124,26 @@ export function KanbanBoard({ columns, onColumnsChange }: KanbanBoardProps) {
     onColumnsChange(newColumns);
   };
 
+  const handleUpdateCard = (cardId: string, cardData: Omit<KanbanCardType, 'id' | 'createdAt'>) => {
+    const newColumns = columns.map(col => ({
+      ...col,
+      cards: col.cards.map(card => 
+        card.id === cardId 
+          ? { ...card, ...cardData }
+          : card
+      )
+    }));
+    onColumnsChange(newColumns);
+  };
+
+  const handleDeleteCard = (cardId: string) => {
+    const newColumns = columns.map(col => ({
+      ...col,
+      cards: col.cards.filter(card => card.id !== cardId)
+    }));
+    onColumnsChange(newColumns);
+  };
+
   const currentColumnTitle = addCardDialog.columnId 
     ? columns.find(col => col.id === addCardDialog.columnId)?.title 
     : undefined;
@@ -141,6 +162,9 @@ export function KanbanBoard({ columns, onColumnsChange }: KanbanBoardProps) {
                 key={column.id}
                 column={column}
                 onAddCard={handleAddCard}
+                onCardClick={onCardClick}
+                onEditCard={(card) => handleUpdateCard(card.id, card)}
+                onDeleteCard={handleDeleteCard}
               />
             ))}
           </div>

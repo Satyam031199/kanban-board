@@ -11,6 +11,7 @@ interface KanbanCardProps {
   card: KanbanCardType;
   onEdit?: (card: KanbanCardType) => void;
   onDelete?: (cardId: string) => void;
+  onCardClick?: (card: KanbanCardType) => void;
 }
 
 const priorityColors = {
@@ -20,7 +21,7 @@ const priorityColors = {
   critical: 'bg-destructive text-destructive-foreground',
 };
 
-export function KanbanCard({ card, onEdit, onDelete }: KanbanCardProps) {
+export function KanbanCard({ card, onEdit, onDelete, onCardClick }: KanbanCardProps) {
   const {
     attributes,
     listeners,
@@ -47,6 +48,12 @@ export function KanbanCard({ card, onEdit, onDelete }: KanbanCardProps) {
         'bg-card border border-border shadow-sm',
         isDragging && 'opacity-50 rotate-3 shadow-lg'
       )}
+      onClick={(e) => {
+        // Only trigger onClick if not dragging
+        if (!isDragging) {
+          onCardClick?.(card);
+        }
+      }}
     >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">

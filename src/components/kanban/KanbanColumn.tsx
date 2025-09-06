@@ -13,13 +13,15 @@ interface KanbanColumnProps {
   onAddCard?: (columnId: string) => void;
   onEditCard?: (card: KanbanCardType) => void;
   onDeleteCard?: (cardId: string) => void;
+  onCardClick?: (card: KanbanCardType) => void;
 }
 
 export function KanbanColumn({ 
   column, 
   onAddCard, 
   onEditCard, 
-  onDeleteCard 
+  onDeleteCard,
+  onCardClick
 }: KanbanColumnProps) {
   const { isOver, setNodeRef } = useDroppable({
     id: column.id,
@@ -66,6 +68,7 @@ export function KanbanColumn({
                   card={card}
                   onEdit={onEditCard}
                   onDelete={onDeleteCard}
+                  onCardClick={onCardClick}
                 />
               </div>
             ))}
