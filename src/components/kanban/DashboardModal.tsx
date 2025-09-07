@@ -72,7 +72,7 @@ export const DashboardModal = ({ isOpen, onOpenChange, columns }: DashboardModal
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-[70%] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">Dashboard Analytics</DialogTitle>
         </DialogHeader>
@@ -124,14 +124,14 @@ export const DashboardModal = ({ isOpen, onOpenChange, columns }: DashboardModal
           </div>
 
           {/* Charts */}
-          <div className="grid grid-cols-1 gap-6">
+          <div className="grid grid-cols-2 gap-6">
             {/* Task Distribution Bar Chart */}
             <Card>
               <CardHeader>
                 <CardTitle>Task Distribution by Status</CardTitle>
                 <CardDescription>Number of tasks in each column</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className='flex justify-center'>
                 <ChartContainer config={chartConfig} className="h-[300px]">
                   <BarChart data={taskStats}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -161,7 +161,7 @@ export const DashboardModal = ({ isOpen, onOpenChange, columns }: DashboardModal
                 <CardTitle>Priority Distribution</CardTitle>
                 <CardDescription>Tasks breakdown by priority level</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className='flex justify-center'>
                 <ChartContainer config={priorityConfig} className="h-[300px]">
                   <PieChart>
                     <Pie
@@ -189,7 +189,7 @@ export const DashboardModal = ({ isOpen, onOpenChange, columns }: DashboardModal
           </div>
 
           {/* Detailed Breakdown Table */}
-          <Card>
+          {/* <Card>
             <CardHeader>
               <CardTitle>Detailed Breakdown</CardTitle>
             </CardHeader>
@@ -213,7 +213,7 @@ export const DashboardModal = ({ isOpen, onOpenChange, columns }: DashboardModal
                 ))}
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
         </div>
       </DialogContent>
     </Dialog>
