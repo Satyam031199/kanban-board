@@ -124,7 +124,7 @@ export const DashboardModal = ({ isOpen, onOpenChange, columns }: DashboardModal
           </div>
 
           {/* Charts */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6">
             {/* Task Distribution Bar Chart */}
             <Card>
               <CardHeader>
