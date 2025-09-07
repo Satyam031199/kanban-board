@@ -55,7 +55,7 @@ const initialColumns: KanbanColumn[] = [
   },
   {
     id: 'quality-control',
-    title: 'Quality Control',
+    title: 'Testing',
     cards: [
       {
         id: '4',
@@ -169,7 +169,7 @@ const Index = () => {
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold">Manufacturing Control Board</h1>
+              <h1 className="text-2xl font-bold">Kanban Board</h1>
               <p className="text-primary-foreground/80 text-sm">
                 Production workflow management system
               </p>

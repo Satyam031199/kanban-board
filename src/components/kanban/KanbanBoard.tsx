@@ -156,7 +156,7 @@ export function KanbanBoard({ columns, onColumnsChange, onCardClick }: KanbanBoa
         onDragEnd={handleDragEnd}
       >
         <ScrollArea className="w-full">
-          <div className="flex gap-6 p-6 min-w-max">
+          <div className="flex gap-6 p-6 min-w-max justify-center">
             {columns.map((column) => (
               <KanbanColumn
                 key={column.id}

@@ -107,7 +107,7 @@ export function CardDetailModal({
                   </Button>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <Button variant="outline" size="sm" className="text-destructive hover:bg-destructive hover:text-destructive-foreground">
+                      <Button variant="outline" size="sm" className="text-destructive hover:bg-destructive hover:text-destructive-foreground mr-4">
                         <Trash2 className="h-4 w-4 mr-1" />
                         Delete
                       </Button>
