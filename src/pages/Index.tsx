@@ -1,9 +1,10 @@
 import { useState, useMemo } from 'react';
 import { KanbanBoard } from '@/components/kanban/KanbanBoard';
 import { CardDetailModal } from '@/components/kanban/CardDetailModal';
+import { DashboardModal } from '@/components/kanban/DashboardModal';
 import { KanbanColumn, KanbanCard } from '@/types/kanban';
 import { Button } from '@/components/ui/button';
-import { Settings, Filter, Search, X } from 'lucide-react';
+import { BarChart3, Filter, Search, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
@@ -92,6 +93,7 @@ const Index = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCard, setSelectedCard] = useState<KanbanCard | null>(null);
   const [isCardModalOpen, setIsCardModalOpen] = useState(false);
+  const [isDashboardOpen, setIsDashboardOpen] = useState(false);
   const [filters, setFilters] = useState({
     assignee: 'all',
     priority: 'all',
@@ -263,9 +265,9 @@ const Index = () => {
                 </PopoverContent>
               </Popover>
               
-              <Button variant="secondary" size="sm">
-                <Settings className="h-4 w-4 mr-2" />
-                Settings
+              <Button variant="secondary" size="sm" onClick={() => setIsDashboardOpen(true)}>
+                <BarChart3 className="h-4 w-4 mr-2" />
+                Dashboard
               </Button>
             </div>
           </div>
@@ -317,6 +319,13 @@ const Index = () => {
         onOpenChange={setIsCardModalOpen}
         onUpdateCard={handleUpdateCard}
         onDeleteCard={handleDeleteCard}
+      />
+
+      {/* Dashboard Modal */}
+      <DashboardModal
+        isOpen={isDashboardOpen}
+        onOpenChange={setIsDashboardOpen}
+        columns={columns}
       />
     </div>
   );
