@@ -4,11 +4,13 @@ import { CardDetailModal } from '@/components/kanban/CardDetailModal';
 import { DashboardModal } from '@/components/kanban/DashboardModal';
 import { KanbanColumn, KanbanCard } from '@/types/kanban';
 import { Button } from '@/components/ui/button';
-import { BarChart3, Filter, Search, X } from 'lucide-react';
+import { BarChart3, Filter, Search, X, LogOut, User } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { useAuth } from '@/contexts/AuthContext';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 // Initial demo data
 const initialColumns: KanbanColumn[] = [
@@ -89,6 +91,7 @@ const initialColumns: KanbanColumn[] = [
 ];
 
 const Index = () => {
+  const { user, signOut } = useAuth();
   const [columns, setColumns] = useState<KanbanColumn[]>(initialColumns);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCard, setSelectedCard] = useState<KanbanCard | null>(null);
@@ -269,6 +272,26 @@ const Index = () => {
                 <BarChart3 className="h-4 w-4 mr-2" />
                 Dashboard
               </Button>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="secondary" size="sm">
+                    <User className="h-4 w-4 mr-2" />
+                    {user?.email?.split('@')[0] || 'User'}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem className="text-sm">
+                    <User className="h-4 w-4 mr-2" />
+                    {user?.email}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={signOut} className="text-destructive">
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>
