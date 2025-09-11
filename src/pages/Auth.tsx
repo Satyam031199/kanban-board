@@ -1,25 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Separator } from '@/components/ui/separator';
-import { useAuth } from '@/contexts/AuthContext';
-import { Github, Mail } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
+import { useAuth } from "@/contexts/AuthContext";
+import { Github, Mail } from "lucide-react";
 
 const Auth = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
   const { user, signUp, signIn, signInWithProvider } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (user) {
-      navigate('/');
+      navigate("/");
     }
   }, [user, navigate]);
 
@@ -35,22 +41,30 @@ const Auth = () => {
     setLoading(true);
     const { error } = await signIn(email, password);
     if (!error) {
-      navigate('/');
+      navigate("/");
     }
     setLoading(false);
   };
 
-  const handleSocialSignIn = async (provider: 'google' | 'github') => {
+  const handleSocialSignIn = async (provider: "google" | "github") => {
     setLoading(true);
     await signInWithProvider(provider);
     setLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-secondary/20 p-4">
-      <Card className="w-full max-w-md">
+    <div className="relative min-h-screen">
+      <img
+        src="/kanban.jpg"
+        alt="Kanban background"
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-45"
+      />
+      <div className="relative z-10 flex min-h-screen items-center justify-center p-4">
+        <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">Welcome to Kanban Board</CardTitle>
+          <CardTitle className="text-2xl font-bold">
+            Welcome to Kanban Board
+          </CardTitle>
           <CardDescription>
             Sign in to your account or create a new one to get started
           </CardDescription>
@@ -58,10 +72,10 @@ const Auth = () => {
         <CardContent>
           <Tabs defaultValue="signin" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              <TabsTrigger value="signin" className="hover:bg-accent hover:text-accent-foreground">Sign In</TabsTrigger>
+              <TabsTrigger value="signup" className="hover:bg-accent hover:text-accent-foreground">Sign Up</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="signin" className="space-y-4">
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
@@ -87,11 +101,11 @@ const Auth = () => {
                   />
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? 'Signing in...' : 'Sign In'}
+                  {loading ? "Signing in..." : "Sign In"}
                 </Button>
               </form>
             </TabsContent>
-            
+
             <TabsContent value="signup" className="space-y-4">
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="space-y-2">
@@ -127,7 +141,7 @@ const Auth = () => {
                   />
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? 'Creating account...' : 'Create Account'}
+                  {loading ? "Creating account..." : "Create Account"}
                 </Button>
               </form>
             </TabsContent>
@@ -144,11 +158,11 @@ const Auth = () => {
                 </span>
               </div>
             </div>
-            
+
             <div className="mt-4 grid grid-cols-2 gap-3">
               <Button
                 variant="outline"
-                onClick={() => handleSocialSignIn('google')}
+                onClick={() => handleSocialSignIn("google")}
                 disabled={loading}
                 className="w-full"
               >
@@ -157,7 +171,7 @@ const Auth = () => {
               </Button>
               <Button
                 variant="outline"
-                onClick={() => handleSocialSignIn('github')}
+                onClick={() => handleSocialSignIn("github")}
                 disabled={loading}
                 className="w-full"
               >
@@ -167,7 +181,8 @@ const Auth = () => {
             </div>
           </div>
         </CardContent>
-      </Card>
+        </Card>
+      </div>
     </div>
   );
 };
