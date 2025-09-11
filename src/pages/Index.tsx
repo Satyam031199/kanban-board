@@ -1,98 +1,53 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { KanbanBoard } from '@/components/kanban/KanbanBoard';
 import { CardDetailModal } from '@/components/kanban/CardDetailModal';
 import { DashboardModal } from '@/components/kanban/DashboardModal';
 import { KanbanColumn, KanbanCard } from '@/types/kanban';
 import { Button } from '@/components/ui/button';
-import { BarChart3, Filter, Search, X, LogOut, User } from 'lucide-react';
+import { BarChart3, Filter, Search, X, LogOut, User, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useAuth } from '@/contexts/AuthContext';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { useToast } from '@/hooks/use-toast';
+import { 
+  createBoard, 
+  createColumn, 
+  getFullBoardData, 
+  updateCard, 
+  deleteCard, 
+  moveCard,
+  DatabaseCard,
+  DatabaseColumn 
+} from '@/lib/actions/kanban.actions';
 
-// Initial demo data
-const initialColumns: KanbanColumn[] = [
-  {
-    id: 'todo',
-    title: 'To Do',
-    cards: [
-      {
-        id: '1',
-        title: 'Setup Production Line A',
-        description: 'Configure and calibrate the new assembly line for Widget A production',
-        priority: 'high',
-        assignee: 'John Smith',
-        dueDate: '2024-01-15',
-        createdAt: '2024-01-01T10:00:00Z',
-        tags: ['setup', 'production'],
-      },
-      {
-        id: '2',
-        title: 'Quality Control Review',
-        description: 'Review and update quality control procedures for compliance',
-        priority: 'medium',
-        assignee: 'Sarah Johnson',
-        dueDate: '2024-01-20',
-        createdAt: '2024-01-02T14:30:00Z',
-        tags: ['quality', 'compliance'],
-      },
-    ],
-  },
-  {
-    id: 'in-progress',
-    title: 'In Progress',
-    cards: [
-      {
-        id: '3',
-        title: 'Machine Maintenance',
-        description: 'Scheduled maintenance on CNC Machine #3',
-        priority: 'critical',
-        assignee: 'Mike Wilson',
-        dueDate: '2024-01-12',
-        createdAt: '2024-01-03T09:15:00Z',
-        tags: ['maintenance', 'critical'],
-      },
-    ],
-  },
-  {
-    id: 'quality-control',
-    title: 'Testing',
-    cards: [
-      {
-        id: '4',
-        title: 'Batch Testing #2024-001',
-        description: 'Testing 500 units from morning production run',
-        priority: 'high',
-        assignee: 'Lisa Chen',
-        dueDate: '2024-01-11',
-        createdAt: '2024-01-04T11:45:00Z',
-        tags: ['testing', 'batch'],
-      },
-    ],
-  },
-  {
-    id: 'done',
-    title: 'Done',
-    cards: [
-      {
-        id: '5',
-        title: 'Equipment Calibration',
-        description: 'Monthly calibration of measuring instruments completed',
-        priority: 'medium',
-        assignee: 'Tom Davis',
-        dueDate: '2024-01-05',
-        createdAt: '2024-01-05T16:20:00Z',
-        tags: ['calibration', 'monthly'],
-      },
-    ],
-  },
-];
+// Transform database data to frontend format
+const transformDatabaseData = (columns: (DatabaseColumn & { cards: DatabaseCard[] })[]): KanbanColumn[] => {
+  return columns.map(col => ({
+    id: col.id,
+    title: col.title,
+    limit: col.card_limit || undefined,
+    cards: col.cards.map(card => ({
+      id: card.id,
+      title: card.title,
+      description: card.description || undefined,
+      priority: card.priority as 'low' | 'medium' | 'high' | 'critical',
+      assignee: card.assignee || undefined,
+      dueDate: card.due_date || undefined,
+      createdAt: card.created_at,
+      tags: card.tags || undefined,
+    }))
+  }));
+};
 
 const Index = () => {
   const { user, signOut } = useAuth();
-  const [columns, setColumns] = useState<KanbanColumn[]>(initialColumns);
+  const { toast } = useToast();
+  const [columns, setColumns] = useState<KanbanColumn[]>([]);
+  const [currentBoardId, setCurrentBoardId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCard, setSelectedCard] = useState<KanbanCard | null>(null);
   const [isCardModalOpen, setIsCardModalOpen] = useState(false);
@@ -102,6 +57,57 @@ const Index = () => {
     priority: 'all',
     dueDate: ''
   });
+
+  // Initialize board data
+  useEffect(() => {
+    const initializeBoard = async () => {
+      if (!user) return;
+      
+      try {
+        setLoading(true);
+        
+        // Try to get user's existing boards
+        const { getUserBoards } = await import('@/lib/actions/kanban.actions');
+        const boards = await getUserBoards();
+        
+        let boardId: string;
+        
+        if (boards.length === 0) {
+          // Create default board and columns for new users
+          const board = await createBoard('My Kanban Board', 'Production workflow management system');
+          boardId = board.id;
+          
+          // Create default columns
+          await Promise.all([
+            createColumn(boardId, 'To Do', 0),
+            createColumn(boardId, 'In Progress', 1),
+            createColumn(boardId, 'Testing', 2),
+            createColumn(boardId, 'Done', 3),
+          ]);
+        } else {
+          // Use the first (most recent) board
+          boardId = boards[0].id;
+        }
+        
+        // Load full board data
+        const boardData = await getFullBoardData(boardId);
+        setCurrentBoardId(boardId);
+        setColumns(transformDatabaseData(boardData.columns));
+        
+      } catch (error) {
+        console.error('Error initializing board:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load board data",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initializeBoard();
+  }, [user, toast]);
 
   // Get unique assignees and priorities for filter options
   const filterOptions = useMemo(() => {
@@ -147,24 +153,67 @@ const Index = () => {
     setIsCardModalOpen(true);
   };
 
-  const handleUpdateCard = (cardId: string, cardData: Omit<KanbanCard, 'id' | 'createdAt'>) => {
-    const newColumns = columns.map(col => ({
-      ...col,
-      cards: col.cards.map(card => 
-        card.id === cardId 
-          ? { ...card, ...cardData }
-          : card
-      )
-    }));
-    setColumns(newColumns);
+  const handleUpdateCard = async (cardId: string, cardData: Omit<KanbanCard, 'id' | 'createdAt'>) => {
+    try {
+      // Update in database
+      await updateCard(cardId, {
+        title: cardData.title,
+        description: cardData.description,
+        priority: cardData.priority,
+        assignee: cardData.assignee,
+        due_date: cardData.dueDate,
+        tags: cardData.tags,
+      });
+
+      // Update local state
+      const newColumns = columns.map(col => ({
+        ...col,
+        cards: col.cards.map(card => 
+          card.id === cardId 
+            ? { ...card, ...cardData }
+            : card
+        )
+      }));
+      setColumns(newColumns);
+
+      toast({
+        title: "Success",
+        description: "Card updated successfully",
+      });
+    } catch (error) {
+      console.error('Error updating card:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update card",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleDeleteCard = (cardId: string) => {
-    const newColumns = columns.map(col => ({
-      ...col,
-      cards: col.cards.filter(card => card.id !== cardId)
-    }));
-    setColumns(newColumns);
+  const handleDeleteCard = async (cardId: string) => {
+    try {
+      // Delete from database
+      await deleteCard(cardId);
+
+      // Update local state
+      const newColumns = columns.map(col => ({
+        ...col,
+        cards: col.cards.filter(card => card.id !== cardId)
+      }));
+      setColumns(newColumns);
+
+      toast({
+        title: "Success",
+        description: "Card deleted successfully",
+      });
+    } catch (error) {
+      console.error('Error deleting card:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete card",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -328,11 +377,20 @@ const Index = () => {
 
       {/* Main Board */}
       <main className="h-[calc(100vh-120px)]">
-        <KanbanBoard 
-          columns={filteredColumns} 
-          onColumnsChange={setColumns} 
-          onCardClick={handleCardClick}
-        />
+        {loading ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Loader2 className="h-6 w-6 animate-spin" />
+              <span>Loading board...</span>
+            </div>
+          </div>
+        ) : (
+          <KanbanBoard 
+            columns={filteredColumns} 
+            onColumnsChange={setColumns} 
+            onCardClick={handleCardClick}
+          />
+        )}
       </main>
 
       {/* Card Detail Modal */}

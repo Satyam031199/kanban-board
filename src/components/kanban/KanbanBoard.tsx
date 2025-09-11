@@ -14,6 +14,8 @@ import { KanbanCard } from './KanbanCard';
 import { AddCardDialog } from './AddCardDialog';
 import { KanbanColumn as KanbanColumnType, KanbanCard as KanbanCardType } from '@/types/kanban';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { createCard, moveCard } from '@/lib/actions/kanban.actions';
+import { useToast } from '@/hooks/use-toast';
 
 interface KanbanBoardProps {
   columns: KanbanColumnType[];
@@ -22,6 +24,7 @@ interface KanbanBoardProps {
 }
 
 export function KanbanBoard({ columns, onColumnsChange, onCardClick }: KanbanBoardProps) {
+  const { toast } = useToast();
   const [activeCard, setActiveCard] = useState<KanbanCardType | null>(null);
   const [addCardDialog, setAddCardDialog] = useState<{
     isOpen: boolean;
@@ -42,7 +45,7 @@ export function KanbanBoard({ columns, onColumnsChange, onCardClick }: KanbanBoa
     setActiveCard(card);
   };
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     setActiveCard(null);
 
@@ -59,33 +62,37 @@ export function KanbanBoard({ columns, onColumnsChange, onCardClick }: KanbanBoa
 
     if (!activeColumn || !overColumn) return;
 
-    // Moving within the same column
-    if (activeColumn.id === overColumn.id) {
-      const cardIndex = activeColumn.cards.findIndex(card => card.id === activeCardId);
-      const newCards = arrayMove(activeColumn.cards, cardIndex, cardIndex);
-      
-      const newColumns = columns.map(col =>
-        col.id === activeColumn.id ? { ...col, cards: newCards } : col
-      );
-      
-      onColumnsChange(newColumns);
-    } else {
-      // Moving between columns
-      const newActiveCards = activeColumn.cards.filter(card => card.id !== activeCardId);
-      const newOverCards = [...overColumn.cards, activeCard];
+    // Moving between columns
+    if (activeColumn.id !== overColumn.id) {
+      try {
+        // Update in database
+        await moveCard(activeCardId, overColumnId, overColumn.cards.length);
 
-      const newColumns = columns.map(col => {
-        if (col.id === activeColumn.id) {
-          return { ...col, cards: newActiveCards };
-        }
-        if (col.id === overColumn.id) {
-          return { ...col, cards: newOverCards };
-        }
-        return col;
-      });
+        // Update local state
+        const newActiveCards = activeColumn.cards.filter(card => card.id !== activeCardId);
+        const newOverCards = [...overColumn.cards, activeCard];
 
-      onColumnsChange(newColumns);
+        const newColumns = columns.map(col => {
+          if (col.id === activeColumn.id) {
+            return { ...col, cards: newActiveCards };
+          }
+          if (col.id === overColumn.id) {
+            return { ...col, cards: newOverCards };
+          }
+          return col;
+        });
+
+        onColumnsChange(newColumns);
+      } catch (error) {
+        console.error('Error moving card:', error);
+        toast({
+          title: "Error",
+          description: "Failed to move card",
+          variant: "destructive",
+        });
+      }
     }
+    // Note: Reordering within the same column can be implemented later if needed
   };
 
   const findCard = (cardId: string): KanbanCardType | null => {
@@ -106,22 +113,54 @@ export function KanbanBoard({ columns, onColumnsChange, onCardClick }: KanbanBoa
     setAddCardDialog({ isOpen: true, columnId });
   };
 
-  const handleCreateCard = (cardData: Omit<KanbanCardType, 'id' | 'createdAt'>) => {
+  const handleCreateCard = async (cardData: Omit<KanbanCardType, 'id' | 'createdAt'>) => {
     if (!addCardDialog.columnId) return;
 
-    const newCard: KanbanCardType = {
-      ...cardData,
-      id: `card-${Date.now()}`,
-      createdAt: new Date().toISOString(),
-    };
+    try {
+      // Create in database
+      const newCard = await createCard({
+        columnId: addCardDialog.columnId,
+        title: cardData.title,
+        description: cardData.description,
+        priority: cardData.priority,
+        assignee: cardData.assignee,
+        dueDate: cardData.dueDate,
+        tags: cardData.tags,
+        position: columns.find(col => col.id === addCardDialog.columnId)?.cards.length || 0,
+      });
 
-    const newColumns = columns.map(col =>
-      col.id === addCardDialog.columnId
-        ? { ...col, cards: [...col.cards, newCard] }
-        : col
-    );
+      // Transform and update local state
+      const frontendCard: KanbanCardType = {
+        id: newCard.id,
+        title: newCard.title,
+        description: newCard.description || undefined,
+        priority: newCard.priority as 'low' | 'medium' | 'high' | 'critical',
+        assignee: newCard.assignee || undefined,
+        dueDate: newCard.due_date || undefined,
+        createdAt: newCard.created_at,
+        tags: newCard.tags || undefined,
+      };
 
-    onColumnsChange(newColumns);
+      const newColumns = columns.map(col =>
+        col.id === addCardDialog.columnId
+          ? { ...col, cards: [...col.cards, frontendCard] }
+          : col
+      );
+
+      onColumnsChange(newColumns);
+      
+      toast({
+        title: "Success",
+        description: "Card created successfully",
+      });
+    } catch (error) {
+      console.error('Error creating card:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create card",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleUpdateCard = (cardId: string, cardData: Omit<KanbanCardType, 'id' | 'createdAt'>) => {
