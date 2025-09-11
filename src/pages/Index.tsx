@@ -4,7 +4,8 @@ import { CardDetailModal } from '@/components/kanban/CardDetailModal';
 import { DashboardModal } from '@/components/kanban/DashboardModal';
 import { KanbanColumn, KanbanCard } from '@/types/kanban';
 import { Button } from '@/components/ui/button';
-import { BarChart3, Filter, Search, X, LogOut, User, Loader2 } from 'lucide-react';
+import { BarChart3, Filter, Search, X, LogOut, User } from 'lucide-react';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
@@ -17,8 +18,7 @@ import {
   createColumn, 
   getFullBoardData, 
   updateCard, 
-  deleteCard, 
-  moveCard,
+  deleteCard,
   DatabaseCard,
   DatabaseColumn 
 } from '@/lib/actions/kanban.actions';
@@ -63,7 +63,7 @@ const Index = () => {
   useEffect(() => {
     const initializeBoard = async () => {
       if (!user) return;
-      
+      console.log(user);
       try {
         setLoading(true);
         
@@ -108,7 +108,7 @@ const Index = () => {
     };
 
     initializeBoard();
-  }, [user, toast]);
+  }, []);
 
   // Get unique assignees and priorities for filter options
   const filterOptions = useMemo(() => {
@@ -325,10 +325,10 @@ const Index = () => {
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="secondary" size="sm">
-                    <User className="h-4 w-4 mr-2" />
-                    {user?.email?.split('@')[0] || 'User'}
-                  </Button>
+                  <Avatar className='cursor-pointer'>
+                    <AvatarImage src={user?.identities[0]?.identity_data?.avatar_url} />
+                    <AvatarFallback color='black' className='text-white bg-red-500'>{user?.identities[0]?.identity_data?.full_name?.charAt(0)}</AvatarFallback>
+                  </Avatar>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem className="text-sm">

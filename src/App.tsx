@@ -8,12 +8,15 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import "@radix-ui/themes/styles.css";
+import { Theme } from "@radix-ui/themes";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
+    <Theme appearance="light">
       <TooltipProvider>
         <Toaster />
         <Sonner />
@@ -30,6 +33,7 @@ const App = () => (
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
+      </Theme>
     </AuthProvider>
   </QueryClientProvider>
 );
