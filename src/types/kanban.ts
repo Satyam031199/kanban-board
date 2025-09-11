@@ -11,7 +11,7 @@ export interface KanbanCard {
 
 export interface KanbanColumn {
   id: string;
-  title: string;
+  title: 'To Do' | 'In Progress' | 'Testing' | 'Done';
   cards: KanbanCard[];
   limit?: number;
 }

@@ -1,10 +1,10 @@
-import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, PieChart, Pie, Cell } from 'recharts';
 import { KanbanColumn } from '@/types/kanban';
-import { CheckCircle, Clock, AlertCircle, PlayCircle } from 'lucide-react';
+import { CheckCircle, AlertCircle, PlayCircle } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface DashboardModalProps {
   isOpen: boolean;
@@ -67,7 +67,7 @@ export const DashboardModal = ({ isOpen, onOpenChange, columns }: DashboardModal
   };
 
   const totalTasks = allTasks.length;
-  const completedTasks = columns.find(col => col.id === 'done')?.cards.length || 0;
+  const completedTasks = columns.find(col => col.title === 'Done')?.cards.length || 0;
   const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
   return (
@@ -107,7 +107,7 @@ export const DashboardModal = ({ isOpen, onOpenChange, columns }: DashboardModal
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-blue-600">
-                  {columns.find(col => col.id === 'in-progress')?.cards.length || 0}
+                  {columns.find(col => col.title === 'In Progress')?.cards.length || 0}
                 </div>
               </CardContent>
             </Card>
@@ -118,7 +118,7 @@ export const DashboardModal = ({ isOpen, onOpenChange, columns }: DashboardModal
                 <AlertCircle className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{completionRate}%</div>
+                <div className={cn("text-2xl font-bold", completionRate > 25 ? 'text-success' : 'text-destructive')}>{completionRate}%</div>
               </CardContent>
             </Card>
           </div>

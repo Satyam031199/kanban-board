@@ -22,12 +22,13 @@ import {
   DatabaseCard,
   DatabaseColumn 
 } from '@/lib/actions/kanban.actions';
+import Loader from '@/components/kanban/Loader';
 
 // Transform database data to frontend format
 const transformDatabaseData = (columns: (DatabaseColumn & { cards: DatabaseCard[] })[]): KanbanColumn[] => {
   return columns.map(col => ({
     id: col.id,
-    title: col.title,
+    title: col.title as 'To Do' | 'In Progress' | 'Testing' | 'Done',
     limit: col.card_limit || undefined,
     cards: col.cards.map(card => ({
       id: card.id,
@@ -380,8 +381,7 @@ const Index = () => {
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <div className="flex items-center gap-2 text-muted-foreground">
-              <Loader2 className="h-6 w-6 animate-spin" />
-              <span>Loading board...</span>
+              <Loader />
             </div>
           </div>
         ) : (
