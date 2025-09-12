@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -100,6 +100,20 @@ const Auth = () => {
                     required
                   />
                 </div>
+                <div className="flex items-start space-x-2">
+                  <input
+                    id="signin-privacy"
+                    type="checkbox"
+                    required
+                    className="mt-1 h-4 w-4"
+                  />
+                  <Label htmlFor="signin-privacy" className="text-sm text-muted-foreground">
+                    I agree to the{" "}
+                    <Link to="/privacy" target="_blank" className="underline">
+                      Privacy Policy
+                    </Link>
+                  </Label>
+                </div>
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? "Signing in..." : "Sign In"}
                 </Button>
@@ -139,6 +153,20 @@ const Auth = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                   />
+                </div>
+                <div className="flex items-start space-x-2">
+                  <input
+                    id="signup-privacy"
+                    type="checkbox"
+                    required
+                    className="mt-1 h-4 w-4"
+                  />
+                  <Label htmlFor="signup-privacy" className="text-sm text-muted-foreground">
+                    I agree to the{" "}
+                    <Link to="/privacy" target="_blank" className="underline">
+                      Privacy Policy
+                    </Link>
+                  </Label>
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? "Creating account..." : "Create Account"}
