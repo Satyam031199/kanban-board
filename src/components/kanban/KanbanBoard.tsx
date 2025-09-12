@@ -5,6 +5,7 @@ import {
   DragOverlay,
   DragStartEvent,
   PointerSensor,
+  TouchSensor,
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
@@ -35,6 +36,12 @@ export function KanbanBoard({ columns, onColumnsChange, onCardClick }: KanbanBoa
     useSensor(PointerSensor, {
       activationConstraint: {
         distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 200,
+        tolerance: 5,
       },
     })
   );
@@ -194,8 +201,8 @@ export function KanbanBoard({ columns, onColumnsChange, onCardClick }: KanbanBoa
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <ScrollArea className="w-full">
-          <div className="flex gap-6 p-6 min-w-max justify-center">
+        <ScrollArea className="w-full h-full">
+          <div className="flex gap-3 sm:gap-6 p-3 sm:p-6 min-w-max justify-start sm:justify-center">
             {columns.map((column) => (
               <KanbanColumn
                 key={column.id}

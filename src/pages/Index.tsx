@@ -221,16 +221,141 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="bg-gradient-primary text-primary-foreground shadow-lg">
-        <div className="container mx-auto px-6 py-4">
+        <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold">Kanban Board</h1>
-              <p className="text-primary-foreground/80 text-sm">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-lg sm:text-2xl font-bold truncate">Kanban Board</h1>
+              <p className="text-primary-foreground/80 text-xs sm:text-sm hidden sm:block">
                 Production workflow management system
               </p>
             </div>
             
-            <div className="flex items-center gap-4">
+            {/* Mobile Actions */}
+            <div className="flex items-center gap-2 sm:hidden">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="secondary" size="sm" className="relative">
+                    <Search className="h-4 w-4" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80" align="end">
+                  <div className="space-y-4">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Search cards..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-9"
+                      />
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
+              
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="secondary" size="sm" className="relative">
+                    <Filter className="h-4 w-4" />
+                    {hasActiveFilters && (
+                      <Badge variant="destructive" className="ml-1 h-2 w-2 p-0">
+                        •
+                      </Badge>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80" align="end">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-semibold">Filters</h3>
+                      {hasActiveFilters && (
+                        <Button variant="ghost" size="sm" onClick={clearFilters}>
+                          <X className="h-4 w-4 mr-1" />
+                          Clear
+                        </Button>
+                      )}
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div>
+                        <label className="text-sm font-medium mb-1 block">Assignee</label>
+                        <Select value={filters.assignee} onValueChange={(value) => 
+                          setFilters(prev => ({ ...prev, assignee: value }))
+                        }>
+                          <SelectTrigger>
+                            <SelectValue placeholder="All assignees" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All assignees</SelectItem>
+                            {filterOptions.assignees.map(assignee => (
+                              <SelectItem key={assignee} value={assignee}>
+                                {assignee}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div>
+                        <label className="text-sm font-medium mb-1 block">Priority</label>
+                        <Select value={filters.priority} onValueChange={(value) => 
+                          setFilters(prev => ({ ...prev, priority: value }))
+                        }>
+                          <SelectTrigger>
+                            <SelectValue placeholder="All priorities" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All priorities</SelectItem>
+                            {filterOptions.priorities.map(priority => (
+                              <SelectItem key={priority} value={priority}>
+                                <span className="capitalize">{priority}</span>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div>
+                        <label className="text-sm font-medium mb-1 block">Due Date</label>
+                        <Input
+                          type="date"
+                          value={filters.dueDate}
+                          onChange={(e) => setFilters(prev => ({ ...prev, dueDate: e.target.value }))}
+                          className="w-full"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
+              
+              <Button variant="secondary" size="sm" onClick={() => setIsDashboardOpen(true)}>
+                <BarChart3 className="h-4 w-4" />
+              </Button>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Avatar className='cursor-pointer h-8 w-8'>
+                    <AvatarImage src={user?.identities[0]?.identity_data?.avatar_url} />
+                    <AvatarFallback className='text-white bg-red-500 text-xs'>{user?.identities[0]?.identity_data?.full_name?.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem className="text-sm">
+                    <User className="h-4 w-4 mr-2" />
+                    {user?.email}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={signOut} className="text-destructive">
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+
+            {/* Desktop Actions */}
+            <div className="hidden sm:flex items-center gap-4">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -327,7 +452,7 @@ const Index = () => {
                 <DropdownMenuTrigger asChild>
                   <Avatar className='cursor-pointer'>
                     <AvatarImage src={user?.identities[0]?.identity_data?.avatar_url} />
-                    <AvatarFallback color='black' className='text-white bg-red-500'>{user?.identities[0]?.identity_data?.full_name?.charAt(0)}</AvatarFallback>
+                    <AvatarFallback className='text-white bg-red-500'>{user?.identities[0]?.identity_data?.full_name?.charAt(0)}</AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -349,26 +474,26 @@ const Index = () => {
 
       {/* Active Filters Display */}
       {hasActiveFilters && (
-        <div className="bg-muted/50 border-b px-6 py-2">
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-muted-foreground">Active filters:</span>
+        <div className="bg-muted/50 border-b px-4 sm:px-6 py-2">
+          <div className="flex items-center gap-2 text-sm overflow-x-auto">
+            <span className="text-muted-foreground whitespace-nowrap">Active filters:</span>
             {searchTerm && (
-              <Badge variant="secondary" className="text-xs">
+              <Badge variant="secondary" className="text-xs whitespace-nowrap">
                 Search: "{searchTerm}"
               </Badge>
             )}
             {filters.assignee !== 'all' && (
-              <Badge variant="secondary" className="text-xs">
+              <Badge variant="secondary" className="text-xs whitespace-nowrap">
                 Assignee: {filters.assignee}
               </Badge>
             )}
             {filters.priority !== 'all' && (
-              <Badge variant="secondary" className="text-xs">
+              <Badge variant="secondary" className="text-xs whitespace-nowrap">
                 Priority: {filters.priority}
               </Badge>
             )}
             {filters.dueDate && (
-              <Badge variant="secondary" className="text-xs">
+              <Badge variant="secondary" className="text-xs whitespace-nowrap">
                 Due: {filters.dueDate}
               </Badge>
             )}
@@ -377,7 +502,7 @@ const Index = () => {
       )}
 
       {/* Main Board */}
-      <main className="h-[calc(100vh-120px)]">
+      <main className="h-[calc(100vh-120px)] sm:h-[calc(100vh-140px)]">
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <div className="flex items-center gap-2 text-muted-foreground">

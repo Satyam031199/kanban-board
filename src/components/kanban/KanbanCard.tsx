@@ -55,51 +55,57 @@ export function KanbanCard({ card, onEdit, onDelete, onCardClick }: KanbanCardPr
         }
       }}
     >
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <h3 className="font-medium text-card-foreground leading-tight">
+      <CardHeader className="pb-2 sm:pb-3 px-3 sm:px-6 pt-3 sm:pt-6">
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="font-medium text-card-foreground leading-tight text-sm sm:text-base flex-1 min-w-0">
             {card.title}
           </h3>
-          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100">
-            <MoreHorizontal className="h-4 w-4" />
+          <Button variant="ghost" size="sm" className="h-6 w-6 sm:h-8 sm:w-8 p-0 opacity-0 group-hover:opacity-100 flex-shrink-0">
+            <MoreHorizontal className="h-3 w-3 sm:h-4 sm:w-4" />
           </Button>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
           <Badge 
             variant="secondary" 
             className={cn(priorityColors[card.priority], 'text-xs')}
           >
             {card.priority}
           </Badge>
-          {card.tags?.map((tag) => (
+          {card.tags?.slice(0, 2).map((tag) => (
             <Badge key={tag} variant="outline" className="text-xs">
               {tag}
             </Badge>
           ))}
+          {card.tags && card.tags.length > 2 && (
+            <Badge variant="outline" className="text-xs">
+              +{card.tags.length - 2}
+            </Badge>
+          )}
         </div>
       </CardHeader>
       
-      <CardContent className="pt-0">
+      <CardContent className="pt-0 px-3 sm:px-6 pb-3 sm:pb-6">
         {card.description && (
-          <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+          <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-3 line-clamp-2">
             {card.description}
           </p>
         )}
         
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between text-xs text-muted-foreground gap-2">
+          <div className="flex items-center gap-1 min-w-0 flex-1">
             {card.assignee && (
-              <div className="flex items-center gap-1">
-                <User className="h-3 w-3" />
-                <span>{card.assignee}</span>
+              <div className="flex items-center gap-1 truncate">
+                <User className="h-3 w-3 flex-shrink-0" />
+                <span className="truncate">{card.assignee}</span>
               </div>
             )}
           </div>
           
           {card.dueDate && (
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 flex-shrink-0">
               <Calendar className="h-3 w-3" />
-              <span>{new Date(card.dueDate).toLocaleDateString()}</span>
+              <span className="hidden sm:inline">{new Date(card.dueDate).toLocaleDateString()}</span>
+              <span className="sm:hidden">{new Date(card.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
             </div>
           )}
         </div>
