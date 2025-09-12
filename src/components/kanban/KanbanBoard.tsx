@@ -201,9 +201,24 @@ export function KanbanBoard({ columns, onColumnsChange, onCardClick }: KanbanBoa
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <div className="w-full h-full overflow-x-auto">
+        <div className="w-full h-full">
           <ScrollArea className="h-full">
-            <div className="flex gap-3 sm:gap-6 p-3 sm:p-6 min-w-max justify-start sm:justify-center">
+            {/* Mobile: Vertical stacking */}
+            <div className="md:hidden space-y-4 p-3">
+              {columns.map((column) => (
+                <KanbanColumn
+                  key={column.id}
+                  column={column}
+                  onAddCard={handleAddCard}
+                  onCardClick={onCardClick}
+                  onEditCard={(card) => handleUpdateCard(card.id, card)}
+                  onDeleteCard={handleDeleteCard}
+                />
+              ))}
+            </div>
+            
+            {/* Desktop: Horizontal layout */}
+            <div className="hidden md:flex gap-6 p-6 min-w-max justify-center">
               {columns.map((column) => (
                 <KanbanColumn
                   key={column.id}

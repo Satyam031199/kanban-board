@@ -123,8 +123,8 @@ export const DashboardModal = ({ isOpen, onOpenChange, columns }: DashboardModal
             </Card>
           </div>
 
-          {/* Charts */}
-          <div className="grid grid-cols-2 gap-6">
+          {/* Charts - Hidden on mobile */}
+          <div className="hidden md:grid grid-cols-2 gap-6">
             {/* Task Distribution Bar Chart */}
             <Card>
               <CardHeader>
