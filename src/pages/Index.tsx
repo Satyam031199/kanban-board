@@ -63,7 +63,6 @@ const Index = () => {
   useEffect(() => {
     const initializeBoard = async () => {
       if (!user) return;
-      console.log(user);
       try {
         setLoading(true);
         
