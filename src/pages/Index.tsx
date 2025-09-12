@@ -346,7 +346,7 @@ const Index = () => {
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={signOut} className="text-destructive">
-                    <LogOut className="h-4 w-4 mr-2" />
+                    <LogOut className="h-4 w-4 mr-2 cursor-pointer" />
                     Sign Out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -461,7 +461,7 @@ const Index = () => {
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={signOut} className="text-destructive">
-                    <LogOut className="h-4 w-4 mr-2" />
+                    <LogOut className="h-4 w-4 mr-2 cursor-pointer" />
                     Sign Out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
