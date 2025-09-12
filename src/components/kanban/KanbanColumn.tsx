@@ -57,7 +57,7 @@ export function KanbanColumn({
       <Card
         ref={setNodeRef}
         className={cn(
-          'flex-1 p-3 sm:p-4 rounded-t-none border-t-0 bg-column-bg/50 transition-colors',
+          'flex-1 p-3 sm:p-4 rounded-t-none border-t-0 bg-column-bg/50 transition-colors overflow-y-auto',
           isOver && 'bg-drag-active/10 border-drag-active animate-drag-enter'
         )}
       >

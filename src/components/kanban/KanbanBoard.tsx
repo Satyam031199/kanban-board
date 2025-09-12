@@ -201,20 +201,22 @@ export function KanbanBoard({ columns, onColumnsChange, onCardClick }: KanbanBoa
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <ScrollArea className="w-full h-full">
-          <div className="flex gap-3 sm:gap-6 p-3 sm:p-6 min-w-max justify-start sm:justify-center">
-            {columns.map((column) => (
-              <KanbanColumn
-                key={column.id}
-                column={column}
-                onAddCard={handleAddCard}
-                onCardClick={onCardClick}
-                onEditCard={(card) => handleUpdateCard(card.id, card)}
-                onDeleteCard={handleDeleteCard}
-              />
-            ))}
-          </div>
-        </ScrollArea>
+        <div className="w-full h-full overflow-x-auto">
+          <ScrollArea className="h-full">
+            <div className="flex gap-3 sm:gap-6 p-3 sm:p-6 min-w-max justify-start sm:justify-center">
+              {columns.map((column) => (
+                <KanbanColumn
+                  key={column.id}
+                  column={column}
+                  onAddCard={handleAddCard}
+                  onCardClick={onCardClick}
+                  onEditCard={(card) => handleUpdateCard(card.id, card)}
+                  onDeleteCard={handleDeleteCard}
+                />
+              ))}
+            </div>
+          </ScrollArea>
+        </div>
 
         <DragOverlay>
           {activeCard ? (
