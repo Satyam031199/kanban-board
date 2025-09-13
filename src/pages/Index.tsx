@@ -218,10 +218,10 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       {/* Header */}
       <header className="bg-gradient-primary text-primary-foreground shadow-lg">
-        <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <div className="flex-1 min-w-0">
               <h1 className="text-lg sm:text-2xl font-bold truncate">Kanban Board</h1>
@@ -506,7 +506,7 @@ const Index = () => {
       )}
 
       {/* Main Board */}
-      <main className="h-[calc(100vh-120px)] sm:h-[calc(100vh-140px)]">
+      <main className="h-[calc(100vh-120px)] sm:h-[calc(100vh-140px)] overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <div className="flex items-center gap-2 text-muted-foreground">

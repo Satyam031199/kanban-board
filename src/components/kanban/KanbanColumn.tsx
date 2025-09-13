@@ -28,7 +28,7 @@ export function KanbanColumn({
   });
 
   return (
-    <div className="flex flex-col h-full md:min-w-[300px] md:max-w-[350px] w-full md:w-auto">
+    <div className="flex flex-col h-full md:min-w-[280px] md:max-w-[320px] w-full md:w-auto flex-shrink-0">
       {/* Column Header */}
       <div className="p-3 sm:p-4 bg-column-bg rounded-t-lg border border-border">
         <div className="flex items-center justify-between mb-2">
