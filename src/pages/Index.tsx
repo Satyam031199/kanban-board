@@ -5,6 +5,7 @@ import { DashboardModal } from '@/components/kanban/DashboardModal';
 import { KanbanColumn, KanbanCard } from '@/types/kanban';
 import { Button } from '@/components/ui/button';
 import { BarChart3, Filter, Search, X, LogOut, User } from 'lucide-react';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -231,6 +232,8 @@ const Index = () => {
             
             {/* Mobile Actions */}
             <div className="flex items-center gap-2 sm:hidden">
+              <ThemeToggle />
+              
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="secondary" size="sm" className="relative">
@@ -355,6 +358,8 @@ const Index = () => {
 
             {/* Desktop Actions */}
             <div className="hidden sm:flex items-center gap-4">
+              <ThemeToggle />
+              
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
