@@ -50,19 +50,19 @@ export const DashboardModal = ({ isOpen, onOpenChange, columns }: DashboardModal
   const priorityConfig = {
     low: {
       label: "Low",
-      color: "hsl(142, 76%, 36%)"
+      color: "hsl(var(--priority-low))"
     },
     medium: {
       label: "Medium", 
-      color: "hsl(47, 96%, 53%)"
+      color: "hsl(var(--priority-medium))"
     },
     high: {
       label: "High",
-      color: "hsl(24, 96%, 53%)"
+      color: "hsl(var(--priority-high))"
     },
     critical: {
       label: "Critical",
-      color: "hsl(0, 84%, 60%)"
+      color: "hsl(var(--priority-critical))"
     }
   };
 
@@ -145,9 +145,9 @@ export const DashboardModal = ({ isOpen, onOpenChange, columns }: DashboardModal
                     />
                     <YAxis />
                     <ChartTooltip content={<ChartTooltipContent />} />
-                    <Bar 
+                     <Bar 
                       dataKey="count" 
-                      fill="var(--color-primary)"
+                      fill="hsl(var(--primary))"
                       radius={[4, 4, 0, 0]}
                     />
                   </BarChart>
