@@ -131,19 +131,19 @@ export const DashboardModal = ({ isOpen, onOpenChange, columns }: DashboardModal
                 <CardTitle>Task Distribution by Status</CardTitle>
                 <CardDescription>Number of tasks in each column</CardDescription>
               </CardHeader>
-              <CardContent className='flex justify-center'>
-                <ChartContainer config={chartConfig} className="h-[300px]">
-                  <BarChart data={taskStats}>
+              <CardContent className='flex justify-center overflow-hidden'>
+                <ChartContainer config={chartConfig} className="h-[300px] w-full max-w-full">
+                  <BarChart data={taskStats} width={350} height={300}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis 
                       dataKey="name" 
-                      tick={{ fontSize: 12 }}
+                      tick={{ fontSize: 10 }}
                       interval={0}
                       angle={-45}
                       textAnchor="end"
                       height={60}
                     />
-                    <YAxis />
+                    <YAxis tick={{ fontSize: 10 }} />
                     <ChartTooltip content={<ChartTooltipContent />} />
                      <Bar 
                       dataKey="count" 
